@@ -13,7 +13,7 @@
  */
 
 #include "dash.h"
-
+#include "psim.h"
 /*-----------------------------------------------------------------------------
  * Function:    main
  * Purpose:     Entry point to program

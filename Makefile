@@ -4,14 +4,17 @@ CPP = g++
 
 #Libraries and flags
 LIBS = -lm
-FLAGS = -g -Wall
+FLAGS = -g -Wall -std=c++11
 
 #Executables
 EXECS = dash
 
-dash: dash.cpp
-	$(CPP) $(LIBS) $(FLAGS) dash.cpp -o dash
+%.o: %.cpp
+	$(CPP) -c -o $@ $< $(FLAGS)
+
+dash: dash.o psim.o
+	$(CPP) $(LIBS) $(FLAGS) -o $@ $?
 
 clean:
-	$(RM) $(EXECS)
+	$(RM) $(EXECS) *.o
 
