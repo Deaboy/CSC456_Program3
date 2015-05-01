@@ -156,7 +156,63 @@ void psim_rr( vector<proc> &processes, const int quantum )
 
 void psim_p( vector<proc> &processes )
 {
+  // declare variables
+  vector<proc> queue;
+  proc current;
+  current.id = 0;
+  current.length = -1;
+  int t = 0;
+
+  // run time simulation
+  for( t = 0; !processes.empty() || !queue.empty() || current.length > 0; t++ )
+  {
+
+    // handle incoming processes
+    if( !processes.empty() && processes.front().start == t )
+    {
+      // add all incoming processes at this time to queue
+      while( !processes.empty() && processes.front().start == t )
+      {
+        cerr << t << ": incoming process " << processes.front().id << endl;
+        
+        queue.push_back( processes.front() );
+        processes.erase( processes.begin() );
+      }
+
+      // Sort queue by priority, then job length
+      sort( queue.begin(), queue.end(), []( const proc& p1, const proc& p2 ) -> bool
+      {
+        return( p1.priority < p2.priority
+              || ( p1.priority == p2.priority && p1.length < p2.length ));
+      });
+    }
+    
+    // Print ouput for currently running process
+    if( current.length == 0 )
+    {
+      cerr << t << ": finished process " << current.id << endl;
+    }
+    
+    // Handle outgoing processes, replace with item in front of queue
+    if( current.length <= 0 && !queue.empty() )
+    {
+      current = queue.front();
+      queue.erase( queue.begin() );
+      
+      cerr << t << ": started process " << current.id << endl; 
+    }
+    
+    // Upkeep
+    if( current.length >= 0 )
+    {
+      current.length--;
+    }
+  }
+  // Final output
+  cerr << t-1 << ": finished process " << current.id << endl;
+  cerr << t-1 << ": end" << endl;
   
+  return;
 }
 
 void psim_sjf( vector<proc> &processes )
