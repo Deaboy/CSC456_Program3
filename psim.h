@@ -26,9 +26,8 @@ struct proc
 };
 
 int psim(int argc, char*argv[]);
+void psim_rr ( vector<proc> &processes, int quantum );
+void psim_p( vector<proc> &processes );
 void psim_sjf( vector<proc> &processes );
-void psim_rr ( vector<proc> &processes );
-void psim_priority( vector<proc> &processes );
-
 #endif
 

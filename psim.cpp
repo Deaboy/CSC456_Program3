@@ -67,15 +67,30 @@ int psim(int argc, char*argv[])
   
   switch (alg)
   {
+  case 0:
+    psim_rr(processes, quantum);
+    break;
+    
+  case 1:
+    psim_p(processes);
+    break;
+    
   case 2:
     psim_sjf(processes);
+    break;
   }
-  case 3:
-    psim_rr(processes);
-  case 4:
-    psim_priorty(processes);
   
   return 0;
+}
+
+void psim_rr( vector<proc> &processes, int quantum )
+{
+  
+}
+
+void psim_p( vector<proc> &processes )
+{
+  
 }
 
 void psim_sjf( vector<proc> &processes )
@@ -145,15 +160,5 @@ void psim_sjf( vector<proc> &processes )
   cerr << t-1 << ": end" << endl;
   
   return;
-}
-
-void psim_rr( vector<proc> &processes )
-{
-  
-}
-
-void psim_priority( vector<proc> &processes )
-{
-  
 }
 
