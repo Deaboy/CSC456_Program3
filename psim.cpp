@@ -109,7 +109,7 @@ void psim_rr( vector<proc> &processes, const int quantum )
       // no sorting for RR
     }
     
-    // Print output for currently running id
+    // Print output for currently running process
     if( current.length == 0 || q == 0 )
     {
       if( current.length == 0 )
@@ -192,36 +192,29 @@ void psim_sjf( vector<proc> &processes )
       });
     }
     
-    // handle outgoing processes, replace with item in front of queue
+    // Print ouput for currently running process
+    if( current.length == 0 )
+    {
+      cerr << t << ": finished process " << current.id << endl;
+    }
+    
+    // Handle outgoing processes, replace with item in front of queue
     if( current.length <= 0 && !queue.empty() )
     {
-      if( current.length == 0 )
-      {
-        cerr << t << ": " << current.id << " replaced by ";
-      }
-      else
-      {
-        cerr << t << ": started process ";
-      }
       current = queue.front();
       queue.erase( queue.begin() );
       
-      cerr << current.id << endl; 
+      cerr << t << ": started process " << current.id << endl; 
     }
     
-    // statistics keeping
+    // Upkeep
     if( current.length >= 0 )
     {
-      if( current.length == 0 )
-      {
-        cerr << t << ": " << current.id << " ends" << endl;
-      }
-    
       current.length--;
     }
-    // TODO
   }
-  
+  // Final output
+  cerr << t-1 << ": finished process " << current.id << endl;
   cerr << t-1 << ": end" << endl;
   
   return;
