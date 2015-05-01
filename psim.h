@@ -27,6 +27,8 @@ struct proc
 
 int psim(int argc, char*argv[]);
 void psim_sjf( vector<proc> &processes );
+void psim_rr ( vector<proc> &processes );
+void psim_priority( vector<proc> &processes );
 
 #endif
 

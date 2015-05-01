@@ -70,6 +70,10 @@ int psim(int argc, char*argv[])
   case 2:
     psim_sjf(processes);
   }
+  case 3:
+    psim_rr(processes);
+  case 4:
+    psim_priorty(processes);
   
   return 0;
 }
@@ -143,4 +147,13 @@ void psim_sjf( vector<proc> &processes )
   return;
 }
 
+void psim_rr( vector<proc> &processes )
+{
+  
+}
+
+void psim_priority( vector<proc> &processes )
+{
+  
+}
 
