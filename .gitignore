@@ -4,3 +4,7 @@ dash
 dash.exe
 *.swp
 *~
+*.in
+*.out
+*.txt
+

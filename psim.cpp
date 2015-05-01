@@ -1,26 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <iomanip>
-#include <fstream>
-#include <string>
-#include <algorithm>
-#include <cstring>
 #include "psim.h"
-
-using namespace std;
-
-struct proc{
-
-  int start;
-  int length;
-  int priority; //high priority is lower number
-
-  bool operator<(const proc& other )const
-  {
-    return start<other.start;
-  }
-
-};
 
 int psim(int argc, char*argv[])
 {
@@ -34,6 +12,7 @@ int psim(int argc, char*argv[])
   if(argc < 3)
   {
     //disp help
+    cout << "Usage:\n\tpsim <file> <sjf | p | rr <quantum>>" << endl;
     return -1;
   }
 
@@ -45,6 +24,7 @@ int psim(int argc, char*argv[])
     if(argc < 4)
     {
       //disp error
+      cerr << "Missing quantum" << endl;
       return -1;
     }
 
@@ -64,6 +44,7 @@ int psim(int argc, char*argv[])
   else
   {
     //error, usage
+    cerr << "Unknown algorithm " << argv[2] << endl;
     return -2;
   }
 
@@ -78,38 +59,69 @@ int psim(int argc, char*argv[])
   
   while(fin >> process.start >> process.length >> process.priority)
   {
+    process.id = processes.size() + 1; 
     processes.push_back(process);  
   }
 
   sort( processes.begin(), processes.end() ); 
+  
+  switch (alg)
+  {
+  case 2:
+    psim_sjf(processes);
+  }
   
   return 0;
 }
 
 void psim_sjf( vector<proc> &processes )
 {
+  // declare variables
   vector<proc> queue;
   proc current;
   int t = 0;
 
+  // run time simulation
   for( t = 0; !processes.empty() || !queue.empty() || current.length > 0; t++)
   {
 
+    // handle incoming processes
     if( !processes.empty() && t == processes[0].start )
     {
+      // add all incoming processes at this time to queue
       while(processes[0].start == t)
       {
+        cerr << t << ": incoming process " << processes[0].id << endl;
+        
         queue.push_back( processes[0] );
         processes.erase( processes.begin() );
       }
 
+      // sort queue by shortest job
+      // note fanceh lambda function
       sort( queue.begin(), queue.end(), [](const proc& p1, const proc& p2 ) -> bool
       {
         return( p1.length < p2.length );
       });
-
     }
+    
+    // handle outgoing processes
+    if( current.length == 0 && !queue.empty() )
+    {
+      cerr << t << ": " << current.id << " replaced by ";
+      
+      current = queue.front();
+      queue.erase( queue.begin() );
+      
+      cerr << current.id << endl; 
+    }
+    
+    // statistics keeping
+    // TODO
   }
+  
+  cerr << t-1 << ": end" << endl;
+  
   return;
 }
 

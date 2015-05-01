@@ -260,6 +260,12 @@ bool Parser(string &cmd)
       }
 
     }
+    //If they want to simulate process scheduler...
+    else if(!strcmp(cCmd, "psim"))
+    {
+      psim(j, cArgs);
+      return 1;
+    }
     //Otherwise, we have an external command, so run it
     else
     {
