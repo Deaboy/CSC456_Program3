@@ -13,7 +13,7 @@
  */
 
 #include "dash.h"
-#include "psim.h"
+
 /*-----------------------------------------------------------------------------
  * Function:    main
  * Purpose:     Entry point to program
@@ -1012,5 +1012,9 @@ static void SignalHandler(int sig)
   
   cout << "\nReceived signal: " << sig << endl;
   
+  if (sig == 11 || sig == 2)
+  {
+    exit(1);
+  }
 }
 

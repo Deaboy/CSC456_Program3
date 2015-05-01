@@ -13,7 +13,7 @@ EXECS = dash
 	$(CPP) -c -o $@ $< $(FLAGS)
 
 dash: dash.o psim.o
-	$(CPP) $(LIBS) $(FLAGS) -o $@ $?
+	$(CPP) $(LIBS) $(FLAGS) -o $@ $^
 
 clean:
 	$(RM) $(EXECS) *.o

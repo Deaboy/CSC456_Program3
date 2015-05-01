@@ -16,7 +16,7 @@ int psim(int argc, char*argv[])
     return -1;
   }
 
-  if( strcasecmp(argv[2], "rr" ) )
+  if( strcasecmp(argv[2], "rr" ) == 0 )
   {
     //prompt for quantum <q>
     alg = 0;
@@ -31,12 +31,12 @@ int psim(int argc, char*argv[])
     quantum = int( strtol( argv[3], NULL, 10 ) );
   }
 
-  else if( strcasecmp(argv[2], "p" ) )
+  else if( strcasecmp(argv[2], "p" ) == 0 )
   {
     alg = 1;
   }
 
-  else if( strcasecmp(argv[2], "sjf" ) )
+  else if( strcasecmp(argv[2], "sjf" ) == 0 )
   {
     alg = 2;
   }
@@ -79,17 +79,19 @@ void psim_sjf( vector<proc> &processes )
   // declare variables
   vector<proc> queue;
   proc current;
+  current.id = 0;
+  current.length = -1;
   int t = 0;
 
   // run time simulation
-  for( t = 0; !processes.empty() || !queue.empty() || current.length > 0; t++)
+  for( t = 0; !processes.empty() || !queue.empty() || current.length > 0; t++ )
   {
 
     // handle incoming processes
     if( !processes.empty() && t == processes[0].start )
     {
       // add all incoming processes at this time to queue
-      while(processes[0].start == t)
+      while(!processes.empty() && processes[0].start == t)
       {
         cerr << t << ": incoming process " << processes[0].id << endl;
         
@@ -99,16 +101,23 @@ void psim_sjf( vector<proc> &processes )
 
       // sort queue by shortest job
       // note fanceh lambda function
-      sort( queue.begin(), queue.end(), [](const proc& p1, const proc& p2 ) -> bool
+      sort( queue.begin(), queue.end(), []( const proc& p1, const proc& p2 ) -> bool
       {
         return( p1.length < p2.length );
       });
     }
     
     // handle outgoing processes
-    if( current.length == 0 && !queue.empty() )
+    if( current.length <= 0 && !queue.empty() )
     {
-      cerr << t << ": " << current.id << " replaced by ";
+      if( current.length == 0 )
+      {
+        cerr << t << ": " << current.id << " replaced by ";
+      }
+      else
+      {
+        cerr << t << ": started process ";
+      }
       
       current = queue.front();
       queue.erase( queue.begin() );
@@ -117,6 +126,15 @@ void psim_sjf( vector<proc> &processes )
     }
     
     // statistics keeping
+    if( current.length >= 0 )
+    {
+      if( current.length == 0 )
+      {
+        cerr << t << ": " << current.id << " ends" << endl;
+      }
+    
+      current.length--;
+    }
     // TODO
   }
   
