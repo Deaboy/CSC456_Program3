@@ -83,9 +83,75 @@ int psim(int argc, char*argv[])
   return 0;
 }
 
-void psim_rr( vector<proc> &processes, int quantum )
+void psim_rr( vector<proc> &processes, const int quantum )
 {
+  vector<proc> queue;
+  proc current;
+  current.id = 0;
+  current.length = -1;
+  int t = 0;
+  int q = -1;
   
+  for( t = 0; !processes.empty() || !queue.empty() || current.length > 0; t++ )
+  {
+    // handle incoming processes
+    if ( !processes.empty() && processes.front().start == t )
+    {
+      // add all incoming processes at this time to queue
+      while( !processes.empty() && processes.front().start == t )
+      {
+        cerr << t << ": incoming process " << processes.front().id << endl;
+        
+        queue.push_back( processes.front() );
+        processes.erase( processes.begin() );
+      }
+      
+      // no sorting for RR
+    }
+    
+    // Print output for currently running id
+    if( current.length == 0 || q == 0 )
+    {
+      if( current.length == 0 )
+      {
+        cerr << t << ": finished process " << current.id << endl;
+      }
+      else if( current.length > 0 && q == 0 )
+      {
+        cerr << t << ": paused process " << current.id << endl;
+      }
+    }
+    
+    // Handle outgoing processes
+    if((( current.length <= 0 || q <= 0 ) && !queue.empty() )
+       || ( current.length > 0 && q <= 0 ))
+    {
+      // Add currently running process back into the queue
+      if( current.length > 0 && q == 0 )
+      {
+        queue.push_back( current );
+      }
+      
+      // Start up first process in queue
+      current = queue.front();
+      queue.erase( queue.begin() );
+      q = quantum;
+      
+      // Display output
+      cerr << t << ": started process " << current.id << endl;
+    }
+    
+    // Upkeep
+    if( current.length >= 0 && q >= 0 )
+    {
+      current.length--;
+      q--;
+    }
+  }
+  
+  // Final output
+  cerr << t-1 << ": finished process " << current.id << endl;
+  cerr << t-1 << ": end" << endl;
 }
 
 void psim_p( vector<proc> &processes )
@@ -107,14 +173,14 @@ void psim_sjf( vector<proc> &processes )
   {
 
     // handle incoming processes
-    if( !processes.empty() && t == processes[0].start )
+    if( !processes.empty() && processes.front().start == t )
     {
       // add all incoming processes at this time to queue
-      while(!processes.empty() && processes[0].start == t)
+      while( !processes.empty() && processes.front().start == t )
       {
-        cerr << t << ": incoming process " << processes[0].id << endl;
+        cerr << t << ": incoming process " << processes.front().id << endl;
         
-        queue.push_back( processes[0] );
+        queue.push_back( processes.front() );
         processes.erase( processes.begin() );
       }
 
@@ -126,7 +192,7 @@ void psim_sjf( vector<proc> &processes )
       });
     }
     
-    // handle outgoing processes
+    // handle outgoing processes, replace with item in front of queue
     if( current.length <= 0 && !queue.empty() )
     {
       if( current.length == 0 )
@@ -137,7 +203,6 @@ void psim_sjf( vector<proc> &processes )
       {
         cerr << t << ": started process ";
       }
-      
       current = queue.front();
       queue.erase( queue.begin() );
       
