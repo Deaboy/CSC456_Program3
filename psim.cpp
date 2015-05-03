@@ -364,3 +364,4 @@ void psim_sjf( vector<proc> &processes )
   cerr << "average turnaround time: " << turnaround << endl;
   cerr << "average response time:   " << response_time << endl;
 }
+
