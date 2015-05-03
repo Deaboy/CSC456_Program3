@@ -72,7 +72,7 @@ int msim(int argc, char*argv[])
     break;
     
   case 2:
-    // TODO LRU
+    msim_lru(ref_string, (unsigned int) num_frames);
     break;
     
   case 3:
@@ -145,17 +145,16 @@ void msim_fifo(vector<int>& ref_string, unsigned int num_frames)
         // Out of space, pop first item off queue and replace that frame
         frame = find(frames.begin(), frames.end(), queue[0]);
         *frame = ref_string[i];
+        
+        // Update queue
         queue.erase(queue.begin());
       }
+      queue.push_back(ref_string[i]);
     }
     else
     {
-      // Remove item from queue so we can insert it at beginning again
-      queue.erase(frame);
+      // There's no fault... WHAT MORE DO YOU WANT FROM ME?!?!
     }
-    
-    // Add item to back of queue no matter what case
-    queue.push_back(ref_string[i]);
     
     // Output frame state
     cout << setw(padding) << ref_string[i] << " -> ";
@@ -261,6 +260,99 @@ void msim_opt(vector<int>& ref_string, unsigned int num_frames)
     }
     
     
+    
+    // Output frame state
+    cout << setw(padding) << ref_string[i] << " -> ";
+    for (j = 0; j < num_frames; j++)
+    {
+      cout << "| ";
+      if (j < frames.size())
+      {
+        cout << setw(padding) << frames[j] << " ";
+      }
+      else
+      {
+        cout << setw(padding) << " " << " ";
+      }
+    }
+    cout << "|";
+    if (fault)
+    {
+      cout << " FAULT";
+    }
+    cout << endl;
+  }
+  
+  // Final output
+  cout << "\n";
+  cout << "page faults: " << faults << endl;
+}
+
+void msim_lru(vector<int>& ref_string, unsigned int num_frames)
+{
+  vector<int> frames;
+  auto frame = frames.end();
+  bool fault;
+  int faults = 0;
+  int padding = 0;
+  int temp;
+  unsigned int i;
+  unsigned int j;
+  
+  vector<int> queue;          // LRU vector that drives the algorithm
+  
+  // For formatting reasons, find 'widest' number
+  for (i = 0; i < ref_string.size(); i++)
+  {
+    // Handle positive and negative numbers differently
+    if (ref_string[i] < 0)
+    {
+      temp = (int) (ceil(log10(-ref_string[i] + 1))) + 1;
+    }
+    else
+    {
+      temp = (int) (ceil(log10(ref_string[i] + 1)));
+    }
+    
+    if (temp > padding) padding = temp;
+  }
+  
+  cout << right;
+  
+  // Work through reference string
+  for (i = 0; i < ref_string.size(); i++)
+  {
+    frame = find(queue.begin(), queue.end(), ref_string[i]);
+    fault = (frame == queue.end());
+    
+    // Check for page faults
+    if (fault)
+    {
+      // Handle page faults
+      faults++;
+        
+      // Check if we have spare space
+      if (frames.size() < num_frames)
+      {
+        // We have plenty of space, just stick it in there (lennyface.jpg)
+        frames.push_back(ref_string[i]);
+      }
+      else
+      {
+        // Out of space, pop first item off queue and replace that frame
+        frame = find(frames.begin(), frames.end(), queue[0]);
+        *frame = ref_string[i];
+        queue.erase(queue.begin());
+      }
+    }
+    else
+    {
+      // Remove item from queue so we can insert it at beginning again
+      queue.erase(frame);
+    }
+    
+    // Add item to back of queue no matter what case
+    queue.push_back(ref_string[i]);
     
     // Output frame state
     cout << setw(padding) << ref_string[i] << " -> ";
