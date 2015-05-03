@@ -24,7 +24,7 @@ int psim(int argc, char*argv[])
     if(argc < 4)
     {
       //disp error
-      cerr << "Missing quantum" << endl;
+      cout << "Missing quantum" << endl;
       return -1;
     }
 
@@ -44,7 +44,7 @@ int psim(int argc, char*argv[])
   else
   {
     //error, usage
-    cerr << "Unknown algorithm " << argv[2] << endl;
+    cout << "Unknown algorithm " << argv[2] << endl;
     return -2;
   }
 
@@ -107,7 +107,7 @@ void psim_rr( vector<proc> &processes, const int quantum )
       // add all incoming processes at this time to queue
       while( !processes.empty() && processes.front().start == t )
       {
-        cerr << t << ": incoming process " << processes.front().id << endl;
+        cout << t << ": incoming process " << processes.front().id << endl;
         
         queue.push_back( processes.front() );
         processes.erase( processes.begin() );
@@ -121,12 +121,12 @@ void psim_rr( vector<proc> &processes, const int quantum )
     {
       if( current.remaining == 0 )
       {
-        cerr << t << ": finished process " << current.id << endl;
+        cout << t << ": finished process " << current.id << endl;
         turnaround += t - current.start;
       }
       else if( current.remaining > 0 && q == 0 )
       {
-        cerr << t << ": paused process " << current.id << endl;
+        cout << t << ": paused process " << current.id << endl;
       }
     }
     
@@ -152,7 +152,7 @@ void psim_rr( vector<proc> &processes, const int quantum )
       }
       
       // Display output
-      cerr << t << ": started process " << current.id << endl;
+      cout << t << ": started process " << current.id << endl;
     }
     
     // Upkeep
@@ -169,8 +169,8 @@ void psim_rr( vector<proc> &processes, const int quantum )
   }
   
   // Final output
-  cerr << t-1 << ": finished process " << current.id << endl;
-  cerr << t-1 << ": end\n" << endl;
+  cout << t-1 << ": finished process " << current.id << endl;
+  cout << t-1 << ": end\n" << endl;
   
   // Update & output stats
   wait_time /= proc_count;
@@ -178,11 +178,11 @@ void psim_rr( vector<proc> &processes, const int quantum )
   turnaround += (t-1) - current.start;
   turnaround /= proc_count;
   response_time /= proc_count;
-  cerr << "total idle time:         " << idle_time << endl;
-  cerr << "system throughput:       " << throughput << endl;
-  cerr << "average wait time:       " << wait_time << endl;
-  cerr << "average turnaround time: " << turnaround << endl;
-  cerr << "average response time:   " << response_time << endl;
+  cout << "total idle time:         " << idle_time << endl;
+  cout << "system throughput:       " << throughput << endl;
+  cout << "average wait time:       " << wait_time << endl;
+  cout << "average turnaround time: " << turnaround << endl;
+  cout << "average response time:   " << response_time << endl;
 }
 
 void psim_p( vector<proc> &processes )
@@ -210,7 +210,7 @@ void psim_p( vector<proc> &processes )
       // add all incoming processes at this time to queue
       while( !processes.empty() && processes.front().start == t )
       {
-        cerr << t << ": incoming process " << processes.front().id << endl;
+        cout << t << ": incoming process " << processes.front().id << endl;
         
         queue.push_back( processes.front() );
         processes.erase( processes.begin() );
@@ -227,7 +227,7 @@ void psim_p( vector<proc> &processes )
     // Print ouput for currently running process
     if( current.remaining == 0 )
     {
-      cerr << t << ": finished process " << current.id << endl;
+      cout << t << ": finished process " << current.id << endl;
       turnaround += t - current.start;
     }
     
@@ -243,7 +243,7 @@ void psim_p( vector<proc> &processes )
         response_time += t - current.start;
       }
       
-      cerr << t << ": started process " << current.id << endl; 
+      cout << t << ": started process " << current.id << endl; 
     }
     
     // Upkeep
@@ -259,8 +259,8 @@ void psim_p( vector<proc> &processes )
   }
   
   // Final output
-  cerr << t-1 << ": finished process " << current.id << endl;
-  cerr << t-1 << ": end\n" << endl;
+  cout << t-1 << ": finished process " << current.id << endl;
+  cout << t-1 << ": end\n" << endl;
   
   // Update & output stats
   wait_time /= proc_count;
@@ -268,11 +268,11 @@ void psim_p( vector<proc> &processes )
   turnaround += (t-1) - current.start;
   turnaround /= proc_count;
   response_time /= proc_count;
-  cerr << "total idle time:         " << idle_time << endl;
-  cerr << "system throughput:       " << throughput << endl;
-  cerr << "average wait time:       " << wait_time << endl;
-  cerr << "average turnaround time: " << turnaround << endl;
-  cerr << "average response time:   " << response_time << endl;
+  cout << "total idle time:         " << idle_time << endl;
+  cout << "system throughput:       " << throughput << endl;
+  cout << "average wait time:       " << wait_time << endl;
+  cout << "average turnaround time: " << turnaround << endl;
+  cout << "average response time:   " << response_time << endl;
 }
 
 void psim_sjf( vector<proc> &processes )
@@ -300,7 +300,7 @@ void psim_sjf( vector<proc> &processes )
       // add all incoming processes at this time to queue
       while( !processes.empty() && processes.front().start == t )
       {
-        cerr << t << ": incoming process " << processes.front().id << endl;
+        cout << t << ": incoming process " << processes.front().id << endl;
         
         queue.push_back( processes.front() );
         processes.erase( processes.begin() );
@@ -317,7 +317,7 @@ void psim_sjf( vector<proc> &processes )
     // Print ouput for currently running process
     if( current.remaining == 0 )
     {
-      cerr << t << ": finished process " << current.id << endl;
+      cout << t << ": finished process " << current.id << endl;
       turnaround += t - current.start;
     }
     
@@ -333,7 +333,7 @@ void psim_sjf( vector<proc> &processes )
         response_time += t - current.start;
       }
       
-      cerr << t << ": started process " << current.id << endl; 
+      cout << t << ": started process " << current.id << endl; 
     }
     
     // Upkeep
@@ -349,8 +349,8 @@ void psim_sjf( vector<proc> &processes )
   }
   
   // Final output
-  cerr << t-1 << ": finished process " << current.id << endl;
-  cerr << t-1 << ": end\n" << endl;
+  cout << t-1 << ": finished process " << current.id << endl;
+  cout << t-1 << ": end\n" << endl;
   
   // Update & output stats
   wait_time /= proc_count;
@@ -358,10 +358,10 @@ void psim_sjf( vector<proc> &processes )
   turnaround += (t-1) - current.start;
   turnaround /= proc_count;
   response_time /= proc_count;
-  cerr << "total idle time:         " << idle_time << endl;
-  cerr << "system throughput:       " << throughput << endl;
-  cerr << "average wait time:       " << wait_time << endl;
-  cerr << "average turnaround time: " << turnaround << endl;
-  cerr << "average response time:   " << response_time << endl;
+  cout << "total idle time:         " << idle_time << endl;
+  cout << "system throughput:       " << throughput << endl;
+  cout << "average wait time:       " << wait_time << endl;
+  cout << "average turnaround time: " << turnaround << endl;
+  cout << "average response time:   " << response_time << endl;
 }
 
