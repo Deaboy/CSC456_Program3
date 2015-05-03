@@ -15,6 +15,7 @@ using namespace std;
 int msim(int argc, char*argv[]);
 
 void msim_fifo(vector<int>& ref_string, unsigned int num_frames);
+void msim_opt(vector<int>& ref_string, unsigned int num_frames);
 
 #endif
 

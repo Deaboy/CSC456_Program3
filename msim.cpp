@@ -68,7 +68,7 @@ int msim(int argc, char*argv[])
     break;
     
   case 1:
-    // TODO Optimal
+    msim_opt(ref_string, (unsigned int) num_frames);
     break;
     
   case 2:
@@ -95,10 +95,10 @@ void msim_fifo(vector<int>& ref_string, unsigned int num_frames)
 {
   vector<int> frames;
   auto frame = frames.end();
+  bool fault;
   int faults = 0;
   int padding = 0;
   int temp;
-  bool fault;
   unsigned int i;
   unsigned int j;
   
@@ -146,6 +146,111 @@ void msim_fifo(vector<int>& ref_string, unsigned int num_frames)
     {
       frames.erase(frames.end()-1);
     }
+    
+    // Output frame state
+    cout << setw(padding) << ref_string[i] << " -> ";
+    for (j = 0; j < num_frames; j++)
+    {
+      cout << "| ";
+      if (j < frames.size())
+      {
+        cout << setw(padding) << frames[j] << " ";
+      }
+      else
+      {
+        cout << setw(padding) << " " << " ";
+      }
+    }
+    cout << "|";
+    if (fault)
+    {
+      cout << " FAULT";
+    }
+    cout << endl;
+  }
+  
+  // Final output
+  cout << "\n";
+  cout << "page faults: " << faults << endl;
+}
+
+void msim_opt(vector<int>& ref_string, unsigned int num_frames)
+{
+  vector<int> frames;
+  auto frame = frames.end();
+  bool fault;
+  int faults = 0;
+  int padding = 0;
+  int temp;
+  unsigned int i;
+  unsigned int j;
+  
+  vector<int> unfound;        // used for searching for last used item
+  
+  // For formatting reasons, find 'widest' number
+  for (i = 0; i < ref_string.size(); i++)
+  {
+    // Handle positive and negative numbers differently
+    if (ref_string[i] < 0)
+    {
+      temp = (int) (ceil(log10(-ref_string[i] + 1))) + 1;
+    }
+    else
+    {
+      temp = (int) (ceil(log10(ref_string[i] + 1)));
+    }
+    
+    if (temp > padding) padding = temp;
+  }
+  
+  cout << right;
+  
+  for (i = 0; i < ref_string.size(); i++)
+  {
+    frame = find(frames.begin(), frames.end(), ref_string[i]);
+    fault = (frame == frames.end());
+    
+    // Check for and handle page faults
+    if (fault)
+    {
+      // Increment counter
+      faults++;
+      
+      // Figure out how to add new frame to our frame space
+      if (frames.size() < num_frames)
+      {
+        // We have room, just append to end of frame list
+        frames.push_back(ref_string[i]);
+      }
+      else
+      {
+        // We don't have room, so figure out who to replace
+        
+        // Build "unfound" list, remove items as they're found
+        unfound = frames;
+        
+        // If a loaded frame is found in reference string's future, try not to
+        // replace it. This is a greedy algorithm.
+        for (j = i + 1; j < ref_string.size() && unfound.size() > 1; j++)
+        {
+          frame = find(unfound.begin(), unfound.end(), ref_string[j]);
+          if (frame != unfound.end())
+          {
+            unfound.erase(frame);
+          }
+        }
+        
+        // Replace first item left in unfound array
+        frame = find(frames.begin(), frames.end(), unfound[0]);
+        *frame = ref_string[i];
+      }
+    }
+    else
+    {
+      // There's no fault... WHAT MORE DO YOU WANT FROM ME?!?!
+    }
+    
+    
     
     // Output frame state
     cout << setw(padding) << ref_string[i] << " -> ";
