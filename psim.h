@@ -17,6 +17,7 @@ struct proc
   int start;
   int length;
   int priority; //high priority is lower number
+  int remaining;
 
   bool operator<(const proc& other )const
   {
@@ -29,5 +30,5 @@ int psim(int argc, char*argv[]);
 void psim_rr ( vector<proc> &processes, int quantum );
 void psim_p( vector<proc> &processes );
 void psim_sjf( vector<proc> &processes );
-#endif
 
+#endif

@@ -60,6 +60,7 @@ int psim(int argc, char*argv[])
   while(fin >> process.start >> process.length >> process.priority)
   {
     process.id = processes.size() + 1; 
+    process.remaining = process.length;
     processes.push_back(process);  
   }
 
@@ -88,7 +89,7 @@ void psim_rr( vector<proc> &processes, const int quantum )
   vector<proc> queue;
   proc current;
   current.id = 0;
-  current.length = -1;
+  current.remaining = -1;
   int t = 0;
   int q = -1;
   int proc_count = processes.size();
@@ -96,8 +97,9 @@ void psim_rr( vector<proc> &processes, const int quantum )
   double throughput = 0.0;      // throughput
   double turnaround = 0.0;      // turnaround time
   double response_time = 0.0;   // average response time
+  double idle_time = 0.0;
   
-  for( t = 0; !processes.empty() || !queue.empty() || current.length > 0; t++ )
+  for( t = 0; !processes.empty() || !queue.empty() || current.remaining > 0; t++ )
   {
     // handle incoming processes
     if ( !processes.empty() && processes.front().start == t )
@@ -115,24 +117,25 @@ void psim_rr( vector<proc> &processes, const int quantum )
     }
     
     // Print output for currently running process
-    if( current.length == 0 || q == 0 )
+    if( current.remaining == 0 || q == 0 )
     {
-      if( current.length == 0 )
+      if( current.remaining == 0 )
       {
         cerr << t << ": finished process " << current.id << endl;
+        turnaround += t - current.start;
       }
-      else if( current.length > 0 && q == 0 )
+      else if( current.remaining > 0 && q == 0 )
       {
         cerr << t << ": paused process " << current.id << endl;
       }
     }
     
     // Handle outgoing processes
-    if((( current.length <= 0 || q <= 0 ) && !queue.empty() )
-       || ( current.length > 0 && q <= 0 ))
+    if((( current.remaining <= 0 || q <= 0 ) && !queue.empty() )
+       || ( current.remaining > 0 && q <= 0 ))
     {
       // Add currently running process back into the queue
-      if( current.length > 0 && q == 0 )
+      if( current.remaining > 0 && q == 0 )
       {
         queue.push_back( current );
       }
@@ -142,14 +145,24 @@ void psim_rr( vector<proc> &processes, const int quantum )
       queue.erase( queue.begin() );
       q = quantum;
       
+      // Stats upkeep
+      if( current.remaining == current.length )
+      {
+        response_time += t - current.start;
+      }
+      
       // Display output
       cerr << t << ": started process " << current.id << endl;
     }
     
     // Upkeep
-    if( current.length >= 0 && q >= 0 )
+    if (current.remaining <= 0)
     {
-      current.length--;
+      idle_time += 1.0;
+    }
+    if( current.remaining >= 0 && q >= 0 )
+    {
+      current.remaining--;
       q--;
     }
     wait_time += queue.size();
@@ -161,7 +174,15 @@ void psim_rr( vector<proc> &processes, const int quantum )
   
   // Update & output stats
   wait_time /= proc_count;
-  cerr << "average wait time: " << wait_time << endl;
+  throughput = (double) proc_count / (double) (t-1);
+  turnaround += (t-1) - current.start;
+  turnaround /= proc_count;
+  response_time /= proc_count;
+  cerr << "total idle time:         " << idle_time << endl;
+  cerr << "system throughput:       " << throughput << endl;
+  cerr << "average wait time:       " << wait_time << endl;
+  cerr << "average turnaround time: " << turnaround << endl;
+  cerr << "average response time:   " << response_time << endl;
 }
 
 void psim_p( vector<proc> &processes )
@@ -170,7 +191,7 @@ void psim_p( vector<proc> &processes )
   vector<proc> queue;
   proc current;
   current.id = 0;
-  current.length = -1;
+  current.remaining = -1;
   int t = 0;
   int proc_count = processes.size();
   double wait_time = 0.0;       // average waiting time
@@ -179,7 +200,7 @@ void psim_p( vector<proc> &processes )
   double response_time = 0.0;   // average response time
 
   // run time simulation
-  for( t = 0; !processes.empty() || !queue.empty() || current.length > 0; t++ )
+  for( t = 0; !processes.empty() || !queue.empty() || current.remaining > 0; t++ )
   {
 
     // handle incoming processes
@@ -198,40 +219,59 @@ void psim_p( vector<proc> &processes )
       sort( queue.begin(), queue.end(), []( const proc& p1, const proc& p2 ) -> bool
       {
         return( p1.priority < p2.priority
-              || ( p1.priority == p2.priority && p1.length < p2.length ));
+              || ( p1.priority == p2.priority && p1.remaining < p2.remaining ));
       });
     }
     
     // Print ouput for currently running process
-    if( current.length == 0 )
+    if( current.remaining == 0 )
     {
       cerr << t << ": finished process " << current.id << endl;
+      turnaround += t - current.start;
     }
     
     // Handle outgoing processes, replace with item in front of queue
-    if( current.length <= 0 && !queue.empty() )
+    if( current.remaining <= 0 && !queue.empty() )
     {
       current = queue.front();
       queue.erase( queue.begin() );
+      
+      // Stats upkeep
+      if( current.remaining == current.length )
+      {
+        response_time += t - current.start;
+      }
       
       cerr << t << ": started process " << current.id << endl; 
     }
     
     // Upkeep
-    if( current.length >= 0 )
+    if (current.remaining <= 0)
     {
-      current.length--;
+      idle_time += 1.0;
+    }
+    if( current.remaining >= 0 )
+    {
+      current.remaining--;
     }
     wait_time += queue.size();
   }
   
   // Final output
   cerr << t-1 << ": finished process " << current.id << endl;
-  cerr << t-1 << ": end" << endl;
+  cerr << t-1 << ": end\n" << endl;
   
   // Update & output stats
   wait_time /= proc_count;
-  cerr << "average wait time: " << wait_time << endl;
+  throughput = (double) proc_count / (double) (t-1);
+  turnaround += (t-1) - current.start;
+  turnaround /= proc_count;
+  response_time /= proc_count;
+  cerr << "total idle time:         " << idle_time << endl;
+  cerr << "system throughput:       " << throughput << endl;
+  cerr << "average wait time:       " << wait_time << endl;
+  cerr << "average turnaround time: " << turnaround << endl;
+  cerr << "average response time:   " << response_time << endl;
 }
 
 void psim_sjf( vector<proc> &processes )
@@ -240,7 +280,7 @@ void psim_sjf( vector<proc> &processes )
   vector<proc> queue;
   proc current;
   current.id = 0;
-  current.length = -1;
+  current.remaining = -1;
   int t = 0;
   int proc_count = processes.size();
   double wait_time = 0.0;       // average waiting time
@@ -249,7 +289,7 @@ void psim_sjf( vector<proc> &processes )
   double response_time = 0.0;   // average response time
 
   // run time simulation
-  for( t = 0; !processes.empty() || !queue.empty() || current.length > 0; t++ )
+  for( t = 0; !processes.empty() || !queue.empty() || current.remaining > 0; t++ )
   {
 
     // handle incoming processes
@@ -268,39 +308,57 @@ void psim_sjf( vector<proc> &processes )
       // note fanceh lambda function
       sort( queue.begin(), queue.end(), []( const proc& p1, const proc& p2 ) -> bool
       {
-        return( p1.length < p2.length );
+        return( p1.remaining < p2.remaining );
       });
     }
     
     // Print ouput for currently running process
-    if( current.length == 0 )
+    if( current.remaining == 0 )
     {
       cerr << t << ": finished process " << current.id << endl;
+      turnaround += t - current.start;
     }
     
     // Handle outgoing processes, replace with item in front of queue
-    if( current.length <= 0 && !queue.empty() )
+    if( current.remaining <= 0 && !queue.empty() )
     {
       current = queue.front();
       queue.erase( queue.begin() );
+      
+      // Stats upkeep
+      if( current.remaining == current.length )
+      {
+        response_time += t - current.start;
+      }
       
       cerr << t << ": started process " << current.id << endl; 
     }
     
     // Upkeep
-    if( current.length >= 0 )
+    if (current.remaining <= 0)
     {
-      current.length--;
+      idle_time += 1.0;
+    }
+    if( current.remaining >= 0 )
+    {
+      current.remaining--;
     }
     wait_time += queue.size();
   }
   
   // Final output
   cerr << t-1 << ": finished process " << current.id << endl;
-  cerr << t-1 << ": end" << endl;
+  cerr << t-1 << ": end\n" << endl;
   
   // Update & output stats
   wait_time /= proc_count;
-  cerr << "average wait time: " << wait_time << endl;
+  throughput = (double) proc_count / (double) (t-1);
+  turnaround += (t-1) - current.start;
+  turnaround /= proc_count;
+  response_time /= proc_count;
+  cerr << "total idle time:         " << idle_time << endl;
+  cerr << "system throughput:       " << throughput << endl;
+  cerr << "average wait time:       " << wait_time << endl;
+  cerr << "average turnaround time: " << turnaround << endl;
+  cerr << "average response time:   " << response_time << endl;
 }
-
