@@ -266,6 +266,12 @@ bool Parser(string &cmd)
       psim(j, cArgs);
       return 1;
     }
+    //If they want to use the memory simulator...
+    else if(!strcmp(cCmd, "msim"))
+    {
+      msim(j, cArgs);
+      return 1;
+    }
     //Otherwise, we have an external command, so run it
     else
     {
