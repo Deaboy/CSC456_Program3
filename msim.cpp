@@ -12,7 +12,7 @@ int msim(int argc, char*argv[])
   // Display help if no arguments are received
   if (argc < 5)
   {
-    cerr << "Usage:\n\tmsim <file> <virtual pages> <physical pages> <fifo|opt|lru|lfu|sc|c>" << endl;
+    cout << "Usage:\n\tmsim <file> <virtual pages> <physical pages> <fifo|opt|lru|lfu|sc|c>" << endl;
     return 0;
   }
   
@@ -20,7 +20,7 @@ int msim(int argc, char*argv[])
   fin.open(argv[1]);
   if (!fin)
   {
-    cerr << "Failed to open " << argv[1] << " for input" << endl;
+    cout << "Failed to open " << argv[1] << " for input" << endl;
     return 1;
   }
   
@@ -43,7 +43,7 @@ int msim(int argc, char*argv[])
     alg = 5;
   else
   {
-    cerr << "Unknown page replacement algorithm " << argv[2] << endl;
+    cout << "Unknown page replacement algorithm " << argv[2] << endl;
     alg = -1;
     return 1;
   }
