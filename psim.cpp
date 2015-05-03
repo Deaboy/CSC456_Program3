@@ -198,6 +198,7 @@ void psim_p( vector<proc> &processes )
   double throughput = 0.0;      // throughput
   double turnaround = 0.0;      // turnaround time
   double response_time = 0.0;   // average response time
+  double idle_time = 0.0;
 
   // run time simulation
   for( t = 0; !processes.empty() || !queue.empty() || current.remaining > 0; t++ )
@@ -287,6 +288,7 @@ void psim_sjf( vector<proc> &processes )
   double throughput = 0.0;      // throughput
   double turnaround = 0.0;      // turnaround time
   double response_time = 0.0;   // average response time
+  double idle_time = 0.0;
 
   // run time simulation
   for( t = 0; !processes.empty() || !queue.empty() || current.remaining > 0; t++ )
