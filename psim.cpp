@@ -91,6 +91,11 @@ void psim_rr( vector<proc> &processes, const int quantum )
   current.length = -1;
   int t = 0;
   int q = -1;
+  int proc_count = processes.size();
+  double wait_time = 0.0;       // average waiting time
+  double throughput = 0.0;      // throughput
+  double turnaround = 0.0;      // turnaround time
+  double response_time = 0.0;   // average response time
   
   for( t = 0; !processes.empty() || !queue.empty() || current.length > 0; t++ )
   {
@@ -147,11 +152,16 @@ void psim_rr( vector<proc> &processes, const int quantum )
       current.length--;
       q--;
     }
+    wait_time += queue.size();
   }
   
   // Final output
   cerr << t-1 << ": finished process " << current.id << endl;
-  cerr << t-1 << ": end" << endl;
+  cerr << t-1 << ": end\n" << endl;
+  
+  // Update & output stats
+  wait_time /= proc_count;
+  cerr << "average wait time: " << wait_time << endl;
 }
 
 void psim_p( vector<proc> &processes )
@@ -162,6 +172,11 @@ void psim_p( vector<proc> &processes )
   current.id = 0;
   current.length = -1;
   int t = 0;
+  int proc_count = processes.size();
+  double wait_time = 0.0;       // average waiting time
+  double throughput = 0.0;      // throughput
+  double turnaround = 0.0;      // turnaround time
+  double response_time = 0.0;   // average response time
 
   // run time simulation
   for( t = 0; !processes.empty() || !queue.empty() || current.length > 0; t++ )
@@ -207,12 +222,16 @@ void psim_p( vector<proc> &processes )
     {
       current.length--;
     }
+    wait_time += queue.size();
   }
+  
   // Final output
   cerr << t-1 << ": finished process " << current.id << endl;
   cerr << t-1 << ": end" << endl;
   
-  return;
+  // Update & output stats
+  wait_time /= proc_count;
+  cerr << "average wait time: " << wait_time << endl;
 }
 
 void psim_sjf( vector<proc> &processes )
@@ -223,6 +242,11 @@ void psim_sjf( vector<proc> &processes )
   current.id = 0;
   current.length = -1;
   int t = 0;
+  int proc_count = processes.size();
+  double wait_time = 0.0;       // average waiting time
+  double throughput = 0.0;      // throughput
+  double turnaround = 0.0;      // turnaround time
+  double response_time = 0.0;   // average response time
 
   // run time simulation
   for( t = 0; !processes.empty() || !queue.empty() || current.length > 0; t++ )
@@ -268,11 +292,15 @@ void psim_sjf( vector<proc> &processes )
     {
       current.length--;
     }
+    wait_time += queue.size();
   }
+  
   // Final output
   cerr << t-1 << ": finished process " << current.id << endl;
   cerr << t-1 << ": end" << endl;
   
-  return;
+  // Update & output stats
+  wait_time /= proc_count;
+  cerr << "average wait time: " << wait_time << endl;
 }
 
