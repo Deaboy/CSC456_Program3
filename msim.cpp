@@ -102,6 +102,8 @@ void msim_fifo(vector<int>& ref_string, unsigned int num_frames)
   unsigned int i;
   unsigned int j;
   
+  vector<int> queue;          // FIFO vector that drives the algorithm
+  
   // For formatting reasons, find 'widest' number
   for (i = 0; i < ref_string.size(); i++)
   {
@@ -123,29 +125,37 @@ void msim_fifo(vector<int>& ref_string, unsigned int num_frames)
   // Work through reference string
   for (i = 0; i < ref_string.size(); i++)
   {
-    frame = find(frames.begin(), frames.end(), ref_string[i]);
-    fault = (frame == frames.end());
+    frame = find(queue.begin(), queue.end(), ref_string[i]);
+    fault = (frame == queue.end());
     
     // Check for page faults
     if (fault)
     {
       // Handle page faults
       faults++;
+        
+      // Check if we have spare space
+      if (frames.size() < num_frames)
+      {
+        // We have plenty of space, just stick it in there (lennyface.jpg)
+        frames.push_back(ref_string[i]);
+      }
+      else
+      {
+        // Out of space, pop first item off queue and replace that frame
+        frame = find(frames.begin(), frames.end(), queue[0]);
+        *frame = ref_string[i];
+        queue.erase(queue.begin());
+      }
     }
     else
     {
       // Remove item from queue so we can insert it at beginning again
-      frames.erase(frame);
+      queue.erase(frame);
     }
     
-    // Add frame to front
-    frames.insert(frames.begin(), ref_string[i]);
-    
-    // Delete last item if overflow
-    while (frames.size() > num_frames)
-    {
-      frames.erase(frames.end()-1);
-    }
+    // Add item to back of queue no matter what case
+    queue.push_back(ref_string[i]);
     
     // Output frame state
     cout << setw(padding) << ref_string[i] << " -> ";
