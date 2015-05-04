@@ -86,7 +86,7 @@ int msim(int argc, char*argv[])
     break;
     
   case 5:
-    // TODO Clock
+    msim_c(ref_string, (unsigned int) num_frames);
     break;
     
   case 6:
@@ -664,6 +664,108 @@ void msim_sc(vector<int>& ref_string, unsigned int num_frames)
     else
     {
       refbit[frame - queue.begin()] = 1;
+    }
+    
+    // Output frame state
+    cout << setw(padding) << ref_string[i] << " -> ";
+    for (j = 0; j < num_frames; j++)
+    {
+      cout << "| ";
+      if (j < frames.size())
+      {
+        cout << setw(padding) << frames[j] << " ";
+      }
+      else
+      {
+        cout << setw(padding) << " " << " ";
+      }
+    }
+    cout << "|";
+    if (fault)
+    {
+      cout << " FAULT";
+    }
+    cout << endl;
+  }
+  
+  // Final output
+  cout << "\n";
+  cout << "page faults: " << faults << endl;
+}
+
+void msim_c(vector<int>& ref_string, unsigned int num_frames)
+{
+  vector<int> frames;
+  auto frame = frames.end();
+  bool fault;
+  int faults = 0;
+  int padding = 0;
+  int temp;
+  unsigned int i;
+  unsigned int j;
+  
+  vector<int> refbit;
+  auto hand = refbit.end();
+  
+  // For formatting reasons, find 'widest' number
+  for (i = 0; i < ref_string.size(); i++)
+  {
+    // Handle positive and negative numbers differently
+    if (ref_string[i] < 0)
+    {
+      temp = (int) (ceil(log10(-ref_string[i] + 1))) + 1;
+    }
+    else
+    {
+      temp = (int) (ceil(log10(ref_string[i] + 1)));
+    }
+    
+    if (temp > padding) padding = temp;
+  }
+  
+  cout << right;
+  
+  // Work through reference string
+  for (i = 0; i < ref_string.size(); i++)
+  {
+    frame = find(frames.begin(), frames.end(), ref_string[i]);
+    fault = (frame == frames.end());
+    
+    // Check for page faults
+    if (fault)
+    {
+      // Handle page faults
+      faults++;
+        
+      // Check if we have spare space
+      if (frames.size() < num_frames)
+      {
+        // We have plenty of space, just stick it in there (lennyface.jpg)
+        frames.push_back(ref_string[i]);
+        refbit.push_back(0);
+        hand = refbit.end() - 1;
+      }
+      else
+      {
+        // Out of space, move hand until we find unreferenced item
+        while (*hand == 1)
+        {
+          *hand = 0;
+          hand++;
+          if (hand == refbit.end())
+          {
+            hand = refbit.begin();
+          }
+        }
+        
+        frame = frames.begin() + (hand - refbit.begin());
+        *frame = ref_string[i];
+      }
+    }
+    else
+    {
+      hand = refbit.begin() + (frame - frames.begin());
+      *hand = 1;
     }
     
     // Output frame state

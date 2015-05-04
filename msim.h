@@ -20,6 +20,7 @@ void msim_lru(vector<int>& ref_string, unsigned int num_frames);
 void msim_lfu(vector<int>& ref_string, unsigned int num_frames);
 void msim_mfu(vector<int>& ref_string, unsigned int num_frames);
 void msim_sc(vector<int>& ref_string, unsigned int num_frames);
+void msim_c(vector<int>& ref_string, unsigned int num_frames);
 
 #endif
 
