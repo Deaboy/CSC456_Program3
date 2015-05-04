@@ -18,14 +18,20 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <semaphore.h>
+#include <pthread.h>
 
 using namespace std;
 
 //Input functions
 void CmdPrompt(string &cmd);
+void MailboxClient();
 
 //Input manipulation functions
 bool Parser(string &cmd);
+bool MailboxClientParser(string cmd);
 
 //Input execution functions
 void Cmdnm(char *pid);
@@ -43,13 +49,33 @@ void PidUsage();
 void CmdnmUsage();
 void SystatUsage();
 void SignalUsage();
+void InitUsage();
+void DelUsage();
+void WriteUsage();
+void ReadUsage();
+void CopyUsage();
+
+//Critical Section
+bool MailboxBeginSem();
+void MailboxEndSem();
+
+//Mailbox Client functions
+void MailboxClientInit();
+void MailboxClientDel();
+
+//Mailbox functions
+void MailboxDel();
+int MailboxInit(int num, int size);
+void MailboxWriter(int box);
+void MailboxReader(int box);
+void MailboxCopier(int srcNum, int destNum);
 
 //Helper functions
 bool FileReader(char *pid, string &cmdline);
 bool FileChecker(char *cmd, ifstream &fin);
 
 //Signal Handlers
-static void SignalHandler(int sig);
+//static void SignalHandler(int sig);
 
 #endif
 
