@@ -272,6 +272,12 @@ bool Parser(string &cmd)
       msim(j, cArgs);
       return 1;
     }
+    //If they want to use the mmu simulator...
+    else if(!strcmp(cCmd, "mmu"))
+    {
+      mmu(j, cArgs);
+      return 1;
+    }
     //Otherwise, we have an external command, so run it
     else
     {
