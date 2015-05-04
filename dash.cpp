@@ -14,6 +14,8 @@
 
 #include "dash.h"
 
+static void SignalHandler(int sig);
+
 /*-----------------------------------------------------------------------------
  * Function:    main
  * Purpose:     Entry point to program
@@ -28,12 +30,12 @@ int main(int argc, char** argv)
   int parser;
   
   //Setup signal handler
-  /*for(int i = 1; i < 32; i++)
+  for(int i = 1; i < 32; i++)
   {
     
     signal(i, SignalHandler);
     
-  }*/
+  }
 
   //Read-Eval loop
   do
@@ -262,9 +264,26 @@ bool Parser(string &cmd)
     }
     else if(!strcmp(cCmd, "mail"))
     {
-      
       MailboxClient();
-      
+      return 1;
+    }
+    //If they want to simulate process scheduler...
+    else if(!strcmp(cCmd, "psim"))
+    {
+      psim(j, cArgs);
+      return 1;
+    }
+    //If they want to use the memory simulator...
+    else if(!strcmp(cCmd, "msim"))
+    {
+      msim(j, cArgs);
+      return 1;
+    }
+    //If they want to use the mmu simulator...
+    else if(!strcmp(cCmd, "mmu"))
+    {
+      mmu(j, cArgs);
+      return 1;
     }
     //Otherwise, we have an external command, so run it
     else
@@ -1006,10 +1025,13 @@ bool FileChecker(char *cmd, ifstream &fin)
  * Output args: N/A
  * Return:      N/A
  */
-/*static void SignalHandler(int sig)
+static void SignalHandler(int sig)
 {
-  
   cout << "\nReceived signal: " << sig << endl;
   
-}*/
+  if (sig == 11 || sig == 2)
+  {
+    exit(1);
+  }
+}
 

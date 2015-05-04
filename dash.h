@@ -22,6 +22,9 @@
 #include <sys/shm.h>
 #include <semaphore.h>
 #include <pthread.h>
+#include "psim.h"
+#include "msim.h"
+#include "mmu.h"
 
 using namespace std;
 
@@ -73,9 +76,6 @@ void MailboxCopier(int srcNum, int destNum);
 //Helper functions
 bool FileReader(char *pid, string &cmdline);
 bool FileChecker(char *cmd, ifstream &fin);
-
-//Signal Handlers
-//static void SignalHandler(int sig);
 
 #endif
 

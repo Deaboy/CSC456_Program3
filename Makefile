@@ -4,14 +4,17 @@ CPP = g++
 
 #Libraries and flags
 LIBS = -lm
-FLAGS = -g -Wall -lpthread
+FLAGS = -g -Wall -lpthread -std=c++11
 
 #Executables
 EXECS = dash
 
-dash: dash.cpp mailbox.cpp
-	$(CPP) $(LIBS) $(FLAGS) dash.cpp mailbox.cpp -o dash
+%.o: %.cpp
+	$(CPP) -c -o $@ $< $(FLAGS)
+
+dash: dash.o psim.o msim.o mmu.o mailbox.o
+	$(CPP) $(LIBS) $(FLAGS) -o $@ $^
 
 clean:
-	$(RM) $(EXECS)
+	$(RM) $(EXECS) *.o
 
