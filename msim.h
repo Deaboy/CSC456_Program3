@@ -1,3 +1,14 @@
+/***************************************************************************//**
+ * File:
+ * msim.h
+ *
+ * Author:
+ * Daniel Andrus
+ * 
+ * Description:
+ * Contains function headers for functions related to the msim command.
+ ******************************************************************************/
+ 
 #ifndef _MSIM_H_
 #define _MSIM_H_
 

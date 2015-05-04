@@ -1,5 +1,34 @@
-#include "msim.h"
+/***************************************************************************//**
+ * File:
+ * msim.cpp
+ *
+ * Author:
+ * Daniel Andrus
+ * 
+ * Description:
+ * Contains implementation for functions related to the msim command.
+ ******************************************************************************/
+ 
+ #include "msim.h"
 
+/***************************************************************************//**
+ * msim
+ *
+ * Author:
+ * Daniel Andrus
+ * 
+ * Description:
+ * Entry function for the msim command. Parses arguments and distributes control
+ * to relevant functions. Also performs file handling.
+ *
+ * Parameters:
+ * argc - Number of arguments supplied to function
+ * argv - The c-style string arguments supplied to function
+ *
+ * Returns:
+ * Numeric code indicating success/failure of function in similar fashion of
+ * main.
+ ******************************************************************************/
 int msim(int argc, char*argv[])
 {
   ifstream fin;
@@ -97,6 +126,25 @@ int msim(int argc, char*argv[])
   return 0;
 }
 
+/***************************************************************************//**
+ * msim_fifo
+ *
+ * Author:
+ * Daniel Andrus
+ * 
+ * Description:
+ * Function to simulate a "first in first out" page management algorithm. Using
+ * a supplied reference string in the form of an integer vector and a maximum
+ * number of frames available to the system, this function displays the state of
+ * the memory frames at each stage of the simulation, highlighting where page
+ * faults occur and keeping a running total of the number of page faults that
+ * occur.
+ *
+ * Parameters:
+ * ref_string - vector of integers supplied in the order in which the pages are
+ * accessed by the system.
+ * num_frames - Maximum number of frames available to the simulation.
+ ******************************************************************************/
 void msim_fifo(vector<int>& ref_string, unsigned int num_frames)
 {
   vector<int> frames;
@@ -189,6 +237,25 @@ void msim_fifo(vector<int>& ref_string, unsigned int num_frames)
   cout << "page faults: " << faults << endl;
 }
 
+/***************************************************************************//**
+ * msim_opt
+ *
+ * Author:
+ * Daniel Andrus
+ * 
+ * Description:
+ * Function to simulate the optimal (predictive) page management algorithm.
+ * Using a supplied reference string in the form of an integer vector and a
+ * maximum number of frames available to the system, this function displays the
+ * state of the memory frames at each stage of the simulation, highlighting
+ * where page faults occur and keeping a running total of the number of page
+ * faults that occur.
+ *
+ * Parameters:
+ * ref_string - vector of integers supplied in the order in which the pages are
+ * accessed by the system.
+ * num_frames - Maximum number of frames available to the simulation.
+ ******************************************************************************/
 void msim_opt(vector<int>& ref_string, unsigned int num_frames)
 {
   vector<int> frames;
@@ -294,6 +361,25 @@ void msim_opt(vector<int>& ref_string, unsigned int num_frames)
   cout << "page faults: " << faults << endl;
 }
 
+/***************************************************************************//**
+ * msim_lru
+ *
+ * Author:
+ * Daniel Andrus
+ * 
+ * Description:
+ * Function to simulate a "least recently used" page management algorithm. Using
+ * a supplied reference string in the form of an integer vector and a maximum
+ * number of frames available to the system, this function displays the state of
+ * the memory frames at each stage of the simulation, highlighting where page
+ * faults occur and keeping a running total of the number of page faults that
+ * occur.
+ *
+ * Parameters:
+ * ref_string - vector of integers supplied in the order in which the pages are
+ * accessed by the system.
+ * num_frames - Maximum number of frames available to the simulation.
+ ******************************************************************************/
 void msim_lru(vector<int>& ref_string, unsigned int num_frames)
 {
   vector<int> frames;
@@ -387,6 +473,25 @@ void msim_lru(vector<int>& ref_string, unsigned int num_frames)
   cout << "page faults: " << faults << endl;
 }
 
+/***************************************************************************//**
+ * msim_lfu
+ *
+ * Author:
+ * Daniel Andrus
+ * 
+ * Description:
+ * Function to simulate a "least frequently used" page management algorithm.
+ * Using a supplied reference string in the form of an integer vector and a
+ * maximum number of frames available to the system, this function displays the
+ * state of the memory frames at each stage of the simulation, highlighting
+ * where page faults occur and keeping a running total of the number of page
+ * faults that occur.
+ *
+ * Parameters:
+ * ref_string - vector of integers supplied in the order in which the pages are
+ * accessed by the system.
+ * num_frames - Maximum number of frames available to the simulation.
+ ******************************************************************************/
 void msim_lfu(vector<int>& ref_string, unsigned int num_frames)
 {
   vector<int> frames;
@@ -488,6 +593,25 @@ void msim_lfu(vector<int>& ref_string, unsigned int num_frames)
   cout << "page faults: " << faults << endl;
 }
 
+/***************************************************************************//**
+ * msim_mfu
+ *
+ * Author:
+ * Daniel Andrus
+ * 
+ * Description:
+ * Function to simulate a "most frequently used" page management algorithm.
+ * Using a supplied reference string in the form of an integer vector and a
+ * maximum number of frames available to the system, this function displays the
+ * state of the memory frames at each stage of the simulation, highlighting
+ * where page faults occur and keeping a running total of the number of page
+ * faults that occur.
+ *
+ * Parameters:
+ * ref_string - vector of integers supplied in the order in which the pages are
+ * accessed by the system.
+ * num_frames - Maximum number of frames available to the simulation.
+ ******************************************************************************/
 void msim_mfu(vector<int>& ref_string, unsigned int num_frames)
 {
   vector<int> frames;
@@ -589,6 +713,25 @@ void msim_mfu(vector<int>& ref_string, unsigned int num_frames)
   cout << "page faults: " << faults << endl;
 }
 
+/***************************************************************************//**
+ * msim_sc
+ *
+ * Author:
+ * Daniel Andrus
+ * 
+ * Description:
+ * Function to simulate a "second chance" page management algorithm. Using
+ * a supplied reference string in the form of an integer vector and a maximum
+ * number of frames available to the system, this function displays the state of
+ * the memory frames at each stage of the simulation, highlighting where page
+ * faults occur and keeping a running total of the number of page faults that
+ * occur.
+ *
+ * Parameters:
+ * ref_string - vector of integers supplied in the order in which the pages are
+ * accessed by the system.
+ * num_frames - Maximum number of frames available to the simulation.
+ ******************************************************************************/
 void msim_sc(vector<int>& ref_string, unsigned int num_frames)
 {
   vector<int> frames;
@@ -693,6 +836,25 @@ void msim_sc(vector<int>& ref_string, unsigned int num_frames)
   cout << "page faults: " << faults << endl;
 }
 
+/***************************************************************************//**
+ * msim_c
+ *
+ * Author:
+ * Daniel Andrus
+ * 
+ * Description:
+ * Function to simulate a "clock" page management algorithm. Using
+ * a supplied reference string in the form of an integer vector and a maximum
+ * number of frames available to the system, this function displays the state of
+ * the memory frames at each stage of the simulation, highlighting where page
+ * faults occur and keeping a running total of the number of page faults that
+ * occur.
+ *
+ * Parameters:
+ * ref_string - vector of integers supplied in the order in which the pages are
+ * accessed by the system.
+ * num_frames - Maximum number of frames available to the simulation.
+ ******************************************************************************/
 void msim_c(vector<int>& ref_string, unsigned int num_frames)
 {
   vector<int> frames;
