@@ -76,7 +76,7 @@ int msim(int argc, char*argv[])
     break;
     
   case 3:
-    // TODO LFU
+    msim_lfu(ref_string, (unsigned int) num_frames);
     break;
     
   case 4:
@@ -353,6 +353,107 @@ void msim_lru(vector<int>& ref_string, unsigned int num_frames)
     
     // Add item to back of queue no matter what case
     queue.push_back(ref_string[i]);
+    
+    // Output frame state
+    cout << setw(padding) << ref_string[i] << " -> ";
+    for (j = 0; j < num_frames; j++)
+    {
+      cout << "| ";
+      if (j < frames.size())
+      {
+        cout << setw(padding) << frames[j] << " ";
+      }
+      else
+      {
+        cout << setw(padding) << " " << " ";
+      }
+    }
+    cout << "|";
+    if (fault)
+    {
+      cout << " FAULT";
+    }
+    cout << endl;
+  }
+  
+  // Final output
+  cout << "\n";
+  cout << "page faults: " << faults << endl;
+}
+
+void msim_lfu(vector<int>& ref_string, unsigned int num_frames)
+{
+  vector<int> frames;
+  auto frame = frames.end();
+  bool fault;
+  int faults = 0;
+  int padding = 0;
+  int temp;
+  unsigned int i;
+  unsigned int j;
+  
+  vector<int> counts;         // LRU vector that drives the algorithm
+  
+  // For formatting reasons, find 'widest' number
+  for (i = 0; i < ref_string.size(); i++)
+  {
+    // Handle positive and negative numbers differently
+    if (ref_string[i] < 0)
+    {
+      temp = (int) (ceil(log10(-ref_string[i] + 1))) + 1;
+    }
+    else
+    {
+      temp = (int) (ceil(log10(ref_string[i] + 1)));
+    }
+    
+    if (temp > padding) padding = temp;
+  }
+  
+  cout << right;
+  
+  // Work through reference string
+  for (i = 0; i < ref_string.size(); i++)
+  {
+    frame = find(frames.begin(), frames.end(), ref_string[i]);
+    fault = (frame == frames.end());
+    
+    // Check for page faults
+    if (fault)
+    {
+      // Handle page faults
+      faults++;
+        
+      // Check if we have spare space
+      if (frames.size() < num_frames)
+      {
+        // We have plenty of space, just stick it in there (lennyface.jpg)
+        frames.push_back(ref_string[i]);
+        counts.push_back(1);
+      }
+      else
+      {
+        // Out of space, choose item to replace
+        frame = counts.begin();
+        
+        // Choose item with lowest count to replace
+        for (j = 0; j < counts.size(); j++)
+        {
+          if (counts[j] < *frame)
+          {
+            frame = counts.begin() + j;
+          }
+        }
+        
+        // Replace element at position frame
+        counts[frame - counts.begin()] = 1;
+        frames[frame - counts.begin()] = ref_string[i];
+      }
+    }
+    else
+    {
+      counts[frame - frames.begin()]++;
+    }
     
     // Output frame state
     cout << setw(padding) << ref_string[i] << " -> ";
