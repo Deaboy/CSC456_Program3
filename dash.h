@@ -19,6 +19,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include "psim.h"
+#include "msim.h"
+#include "mmu.h"
 
 using namespace std;
 
