@@ -11,7 +11,7 @@ int msim(int argc, char*argv[])
   // Display help if no arguments are received
   if (argc < 4)
   {
-    cout << "Usage:\n\tmsim <file> <frames> <fifo|opt|lru|lfu|sc|c>" << endl;
+    cout << "Usage:\n\tmsim <file> <frames> <fifo|opt|lru|lfu|mfu|sc|c>" << endl;
     return 0;
   }
   
@@ -43,6 +43,8 @@ int msim(int argc, char*argv[])
     alg = 2;
   else if (strcmp(argv[3], "lfu") == 0)
     alg = 3;
+  else if (strcmp(argv[3], "mfu") == 0)
+    alg = 6;
   else if (strcmp(argv[3], "sc") == 0)
     alg = 4;
   else if (strcmp(argv[3], "c") == 0)
@@ -80,11 +82,15 @@ int msim(int argc, char*argv[])
     break;
     
   case 4:
-    // TODO Second Chance
+    msim_sc(ref_string, (unsigned int) num_frames);
     break;
     
   case 5:
     // TODO Clock
+    break;
+    
+  case 6:
+    msim_mfu(ref_string, (unsigned int) num_frames);
     break;
   }
 
@@ -392,7 +398,7 @@ void msim_lfu(vector<int>& ref_string, unsigned int num_frames)
   unsigned int i;
   unsigned int j;
   
-  vector<int> counts;         // LRU vector that drives the algorithm
+  vector<int> counts;
   
   // For formatting reasons, find 'widest' number
   for (i = 0; i < ref_string.size(); i++)
@@ -453,6 +459,211 @@ void msim_lfu(vector<int>& ref_string, unsigned int num_frames)
     else
     {
       counts[frame - frames.begin()]++;
+    }
+    
+    // Output frame state
+    cout << setw(padding) << ref_string[i] << " -> ";
+    for (j = 0; j < num_frames; j++)
+    {
+      cout << "| ";
+      if (j < frames.size())
+      {
+        cout << setw(padding) << frames[j] << " ";
+      }
+      else
+      {
+        cout << setw(padding) << " " << " ";
+      }
+    }
+    cout << "|";
+    if (fault)
+    {
+      cout << " FAULT";
+    }
+    cout << endl;
+  }
+  
+  // Final output
+  cout << "\n";
+  cout << "page faults: " << faults << endl;
+}
+
+void msim_mfu(vector<int>& ref_string, unsigned int num_frames)
+{
+  vector<int> frames;
+  auto frame = frames.end();
+  bool fault;
+  int faults = 0;
+  int padding = 0;
+  int temp;
+  unsigned int i;
+  unsigned int j;
+  
+  vector<int> counts;
+  
+  // For formatting reasons, find 'widest' number
+  for (i = 0; i < ref_string.size(); i++)
+  {
+    // Handle positive and negative numbers differently
+    if (ref_string[i] < 0)
+    {
+      temp = (int) (ceil(log10(-ref_string[i] + 1))) + 1;
+    }
+    else
+    {
+      temp = (int) (ceil(log10(ref_string[i] + 1)));
+    }
+    
+    if (temp > padding) padding = temp;
+  }
+  
+  cout << right;
+  
+  // Work through reference string
+  for (i = 0; i < ref_string.size(); i++)
+  {
+    frame = find(frames.begin(), frames.end(), ref_string[i]);
+    fault = (frame == frames.end());
+    
+    // Check for page faults
+    if (fault)
+    {
+      // Handle page faults
+      faults++;
+        
+      // Check if we have spare space
+      if (frames.size() < num_frames)
+      {
+        // We have plenty of space, just stick it in there (lennyface.jpg)
+        frames.push_back(ref_string[i]);
+        counts.push_back(1);
+      }
+      else
+      {
+        // Out of space, choose item to replace
+        frame = counts.begin();
+        
+        // Choose item with lowest count to replace
+        for (j = 0; j < counts.size(); j++)
+        {
+          if (counts[j] > *frame)
+          {
+            frame = counts.begin() + j;
+          }
+        }
+        
+        // Replace element at position frame
+        counts[frame - counts.begin()] = 1;
+        frames[frame - counts.begin()] = ref_string[i];
+      }
+    }
+    else
+    {
+      counts[frame - frames.begin()]++;
+    }
+    
+    // Output frame state
+    cout << setw(padding) << ref_string[i] << " -> ";
+    for (j = 0; j < num_frames; j++)
+    {
+      cout << "| ";
+      if (j < frames.size())
+      {
+        cout << setw(padding) << frames[j] << " ";
+      }
+      else
+      {
+        cout << setw(padding) << " " << " ";
+      }
+    }
+    cout << "|";
+    if (fault)
+    {
+      cout << " FAULT";
+    }
+    cout << endl;
+  }
+  
+  // Final output
+  cout << "\n";
+  cout << "page faults: " << faults << endl;
+}
+
+void msim_sc(vector<int>& ref_string, unsigned int num_frames)
+{
+  vector<int> frames;
+  auto frame = frames.end();
+  bool fault;
+  int faults = 0;
+  int padding = 0;
+  int temp;
+  unsigned int i;
+  unsigned int j;
+  
+  vector<int> queue;          // FIFO vector that drives the algorithm
+  vector<int> refbit;
+  
+  // For formatting reasons, find 'widest' number
+  for (i = 0; i < ref_string.size(); i++)
+  {
+    // Handle positive and negative numbers differently
+    if (ref_string[i] < 0)
+    {
+      temp = (int) (ceil(log10(-ref_string[i] + 1))) + 1;
+    }
+    else
+    {
+      temp = (int) (ceil(log10(ref_string[i] + 1)));
+    }
+    
+    if (temp > padding) padding = temp;
+  }
+  
+  cout << right;
+  
+  // Work through reference string
+  for (i = 0; i < ref_string.size(); i++)
+  {
+    frame = find(queue.begin(), queue.end(), ref_string[i]);
+    fault = (frame == queue.end());
+    
+    // Check for page faults
+    if (fault)
+    {
+      // Handle page faults
+      faults++;
+        
+      // Check if we have spare space
+      if (frames.size() < num_frames)
+      {
+        // We have plenty of space, just stick it in there (lennyface.jpg)
+        frames.push_back(ref_string[i]);
+      }
+      else
+      {
+        // Out of space, find first item in queue not referenced
+        for (j = 0; j < refbit.size() && refbit[j] == 1; j++)
+        {
+          refbit[j] = 0;
+        }
+        if (j == refbit.size())
+        {
+          j = 0;
+        }
+        
+        frame = find(frames.begin(), frames.end(), queue[j]);
+        *frame = ref_string[i];
+        
+        // Update queue
+        refbit.erase(refbit.begin() + j);
+        queue.erase(queue.begin() + j);
+      }
+      queue.push_back(ref_string[i]);
+      refbit.push_back(0);
+    }
+    else
+    {
+      refbit[frame - queue.begin()] = 1;
     }
     
     // Output frame state
