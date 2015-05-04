@@ -1,3 +1,14 @@
+/***************************************************************************//**
+ * File:
+ * psim.h
+ *
+ * Author:
+ * Daniel Andrus, Joseph Mowery
+ * 
+ * Description:
+ * Contains function headers for functions related to the psim command.
+ ******************************************************************************/
+
 #ifndef _PRISM_H_
 #define _PRISM_H_
 

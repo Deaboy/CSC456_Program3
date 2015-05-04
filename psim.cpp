@@ -1,5 +1,36 @@
+/***************************************************************************//**
+ * File:
+ * psim.cpp
+ *
+ * Author:
+ * Daniel Andrus, Joseph Mowery
+ * 
+ * Description:
+ * Contains implementation for functions related to the psim command.
+ ******************************************************************************/
+
 #include "psim.h"
 
+/***************************************************************************//**
+ * psim
+ *
+ * Author:
+ * Daniel Andrus, Joseph Mowery
+ * 
+ * Description:
+ * Entry point for the psim command. Parses arguments and distributes control to
+ * appropriate functions.
+ *
+ * Usage:
+ * psim <file> <sjf | p | rr <quantum>>
+ *
+ * Parameters:
+ * argc - Number of arguments supplied to function
+ * argv - The c-style strings of arguments supplied to the function
+ *
+ * Returns:
+ * Integer result of function, similar to that of main.
+ ******************************************************************************/
 int psim(int argc, char*argv[])
 {
   int alg;
@@ -84,6 +115,22 @@ int psim(int argc, char*argv[])
   return 0;
 }
 
+/***************************************************************************//**
+ * psim_rr
+ *
+ * Author:
+ * Daniel Andrus
+ * 
+ * Description:
+ * Simulates a round-robin process scheduler on a list of processes using the
+ * supplied time quantum.
+ *
+ * Parameters:
+ * processes - Vector of proc structs listing the incoming processes in the
+ * order of their arrival.
+ * quanum - The time quantum to use for the simulation. Must be a positive
+ * integer to avoid an infinite loop.
+ ******************************************************************************/
 void psim_rr( vector<proc> &processes, const int quantum )
 {
   vector<proc> queue;
@@ -185,6 +232,19 @@ void psim_rr( vector<proc> &processes, const int quantum )
   cout << "average response time:   " << response_time << endl;
 }
 
+/***************************************************************************//**
+ * psim_p
+ *
+ * Author:
+ * Daniel Andrus
+ * 
+ * Description:
+ * Simulates a priority-based process scheduler on a list of processes
+ *
+ * Parameters:
+ * processes - Vector of proc structs listing the incoming processes in the
+ * order of their arrival.
+ ******************************************************************************/
 void psim_p( vector<proc> &processes )
 {
   // declare variables
@@ -275,6 +335,19 @@ void psim_p( vector<proc> &processes )
   cout << "average response time:   " << response_time << endl;
 }
 
+/***************************************************************************//**
+ * psim_sjf
+ *
+ * Author:
+ * Daniel Andrus
+ * 
+ * Description:
+ * Simulates a shortest-job-first process scheduler on a list of processes
+ *
+ * Parameters:
+ * processes - Vector of proc structs listing the incoming processes in the
+ * order of their arrival.
+ ******************************************************************************/
 void psim_sjf( vector<proc> &processes )
 {
   // declare variables
