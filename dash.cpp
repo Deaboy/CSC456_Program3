@@ -28,12 +28,12 @@ int main(int argc, char** argv)
   int parser;
   
   //Setup signal handler
-  for(int i = 1; i < 32; i++)
+  /*for(int i = 1; i < 32; i++)
   {
     
     signal(i, SignalHandler);
     
-  }
+  }*/
 
   //Read-Eval loop
   do
@@ -260,12 +260,17 @@ bool Parser(string &cmd)
       }
 
     }
+    else if(!strcmp(cCmd, "mail"))
+    {
+      
+      MailboxClient();
+      
+    }
     //Otherwise, we have an external command, so run it
     else
     {
       
       ExecuteExternalCommand(cCmd, cArgs);
-      return 1;
       
     }
     
@@ -1001,10 +1006,10 @@ bool FileChecker(char *cmd, ifstream &fin)
  * Output args: N/A
  * Return:      N/A
  */
-static void SignalHandler(int sig)
+/*static void SignalHandler(int sig)
 {
   
   cout << "\nReceived signal: " << sig << endl;
   
-}
+}*/
 
